@@ -4,9 +4,9 @@ export default function About() {
   return (
     <>
     <h1 className="flex items-center justify-center h-[100vh] text-3xl">
-      Hello World!
+      About Page
     </h1>
-    <Link href="/about">Go to About Page</Link>
+    <Link href="/">Go to Home</Link>
     </>
   );
 }
