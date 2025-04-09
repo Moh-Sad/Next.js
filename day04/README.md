@@ -1,0 +1,1 @@
+day 4:SSR, SSG, segment-level caching, dynamicParams, 
