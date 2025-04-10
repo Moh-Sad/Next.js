@@ -1,50 +1,144 @@
-# Day 1: Next.js Learning Journey
+# Day 5: Next.js Learning - Components Architecture & WikiRocket Project
 
-## Overview
-This repository documents my first day of learning Next.js. I explored the fundamental concepts of Next.js, understood why it's used, what makes it a preferred framework, and learned about rendering in Next.js. Finally, I implemented a simple "Hello World" example to get hands-on experience.
+## Project Overview: WikiRocket
 
-## Key Learnings
+Built a Wikipedia-style search application that demonstrates:
+- Client-side data fetching
+- Component composition
+- Error boundaries
+- Loading states
+- Server vs Client component patterns
 
-### What is Next.js?
-Next.js is a React framework that enables server-side rendering (SSR), static site generation (SSG), and client-side rendering (CSR). It provides an excellent developer experience with features like fast refresh, file-based routing, and API routes.
+## Component Types Identified
 
-### Why Use Next.js?
-- **Performance Optimization**: Automatic code splitting, image optimization, and prefetching.
-- **SEO Benefits**: Server-side rendering improves search engine visibility.
-- **Hybrid Rendering**: Supports SSR, SSG, and CSR in the same application.
-- **Developer Experience**: Built-in routing, API routes, and TypeScript support.
-- **Scalability**: Suitable for small to large-scale applications.
+### 1. Server Components
+- **SearchLayout.tsx**: Static layout wrapper
+- **Metadata**: Dynamic metadata generation
+- **StaticContent**: Non-interactive content
 
-### Rendering in Next.js
-Next.js supports multiple rendering methods:
-1. **Server-Side Rendering (SSR)**: Pages are rendered on each request.
-2. **Static Site Generation (SSG)**: Pages are rendered at build time.
-3. **Client-Side Rendering (CSR)**: Pages are rendered in the browser.
+### 2. Client Components
+- **SearchBar.tsx** (`'use client'`): Handles user input
+- **ResultsList.tsx** (`'use client'`): Interactive results display
+- **HistoryTracker.tsx**: Maintains search history in state
 
-## Getting Started
+## Project Structure
 
-### Installation
-To create a new Next.js project, run:
-```bash
-npx create-next-app@latest
+```
+wiki-rocket/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx            # Main page (server)
+│   ├── loading.tsx         # Automatic suspense boundary
+│   └── error.tsx           # Error boundary
+├── components/
+│   ├── client/             # Client components
+│   │   ├── SearchBar.tsx
+│   │   └── ResultsList.tsx
+│   └── server/             # Server components
+│       └── SearchLayout.tsx
+└── lib/
+    └── api.ts              # Fetch utilities
 ```
 
-### Running the Development Server
+## Key Implementations
+
+### 1. Client-Side Search (SearchBar.tsx)
+```tsx
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+export default function SearchBar() {
+  const [query, setQuery] = useState('')
+  const router = useRouter()
+
+  const handleSearch = () => {
+    router.push(`/?search=${encodeURIComponent(query)}`)
+  }
+
+  return (
+    <div className="search-container">
+      <input 
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search Wikipedia..."
+      />
+      <button onClick={handleSearch}>Launch</button>
+    </div>
+  )
+}
+```
+
+### 2. Loading State (app/loading.tsx)
+```tsx
+export default function Loading() {
+  return (
+    <div className="loading-rocket">
+      <RocketAnimation />
+      <p>Preparing your knowledge launch...</p>
+    </div>
+  )
+}
+```
+
+### 3. Error Handling (app/error.tsx)
+```tsx
+'use client'
+
+export default function ErrorBoundary({
+  error,
+  reset
+}: {
+  error: Error
+  reset: () => void
+}) {
+  return (
+    <div className="error-container">
+      <h2>Launch Failure!</h2>
+      <p>{error.message}</p>
+      <button onClick={reset}>Retry Launch</button>
+    </div>
+  )
+}
+```
+
+## Component Type Identification Guide
+
+| Characteristic          | Server Component       | Client Component          |
+|-------------------------|------------------------|---------------------------|
+| Interactivity           | No                     | Yes                       |
+| Hooks                   | No                     | Yes (useState, useEffect) |
+| Browser APIs            | No                     | Yes                       |
+| Data Fetching           | Async/Await            | Fetch/XHR                 |
+| Rendering               | Server                 | Client                    |
+| Bundle Size Impact      | Low                    | Higher                    |
+| Example Use Cases       | Layouts, Static content| Forms, Interactive UI     |
+
+##  Lessons Learned
+
+1. **Performance Benefits**: Server components reduce bundle size by keeping interactive logic client-side only
+2. **Error Boundaries**: Component-level error handling prevents full app crashes
+3. **Loading States**: Built-in Suspense boundaries provide smooth transitions
+4. **Type Safety**: TypeScript helps identify component misuse during development
+5. **Architecture**: Logical separation improves maintainability
+
+##  How to Run WikiRocket
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Run development server:
 ```bash
 npm run dev
 ```
 
-### Hello World Example
-In `pages/index.js`, I implemented a simple "Hello World" component:
-```jsx
-export default function Home() {
-  return <h1>Hello World!</h1>;
-}
-```
+3. Visit `http://localhost:3000` and test the search functionality
 
-## Next Steps
-- Explore pages and layouts
+##  Next Steps
 
-## Resources
-- [Next.js Official Documentation](https://nextjs.org/docs)
-- [Learn Next.js](https://nextjs.org/learn)
+- Implement search history persistence
+- Add debounce to search input
+- Create shareable search result links
+- Add offline support with service workers
